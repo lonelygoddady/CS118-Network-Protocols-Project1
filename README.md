@@ -1,5 +1,6 @@
 UID: 504135743
 Name: ZHUOQI LI
+
 Library used for server:
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -71,3 +72,9 @@ Problem & Solutions:
 
 3. Client does not exit the way it is required to when network disconnection happens while transferring
    Solution: A signal handler is created for SIGPIPE for send() error due to network disconnection. 
+
+4. Connection/data transfer timeout setting
+   Solution: Use the select function to set timeout.
+
+5. Client blocking and timeout not triggered
+   Solution: Use fnctl to set the file descriptor to be non-blocking. 
