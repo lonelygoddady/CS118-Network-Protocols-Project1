@@ -78,3 +78,6 @@ Problem & Solutions:
 
 5. Client blocking and timeout not triggered
    Solution: Use fnctl to set the file descriptor to be non-blocking. 
+
+Reference:
+I did not use any sources other than Beejee's network programming guide and examplecode provided on class website. 

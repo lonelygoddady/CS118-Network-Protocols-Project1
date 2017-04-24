@@ -68,12 +68,11 @@ int main(int argc, char *argv[])
   sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
   
   // connect to the server
-  int flags = fcntl(sockfd, F_GETFL, 0);
-  fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
+    int flags = fcntl(sockfd, F_GETFL, 0);
+    fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
   
  // if (connect(sockfd, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)   {
   if (connect(sockfd, res->ai_addr, res->ai_addrlen))  { 
-      //some other connection error
       if (errno != EINPROGRESS){
           cerr << "ERROR: Error connecting to server" << endl;
           exit(EXIT_FAILURE);    
@@ -90,7 +89,6 @@ int main(int argc, char *argv[])
       int select_ret = select(sockfd+1, NULL, &write_fds, NULL, &tv);
       if(select_ret == 0)
         {
-            //connection timeout
             close(sockfd);
             cerr<<"ERROR: Attempt to connect to the server timedout!"<<endl;
             exit(EXIT_FAILURE);
@@ -101,17 +99,15 @@ int main(int argc, char *argv[])
             cerr<<"ERROR: Error with select() method!"<<endl;
             exit(EXIT_FAILURE);
         }
-      else{ //select_ret > 0
-          // Socket selected for write 
+      else{ 
           socklen_t lon = sizeof(int); 
           int valopt;
           if (getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &lon) < 0) { 
             cerr << "ERROR: getsockopt" << endl;  
             exit(EXIT_FAILURE); 
           } 
-          // Check the value returned... 
           if (valopt) { 
-            cerr << "ERROR: Cannot connect o server" << endl;  
+            cerr << "ERROR: Cannot connect to server" << endl;  
             exit(EXIT_FAILURE); 
           } 
       }
@@ -150,16 +146,14 @@ int main(int argc, char *argv[])
   while (1) {
         memset(buffer, '\0', buf_s);
         file.read(buffer, buf_s);
-        if (file.fail() && !file.eof()){ //&& !file.eof()){  //check whether reading from file succeeds 
+        if (file.fail() && !file.eof()){ //&& !file.eof()){  
             cerr << "ERROR: Error durring reading from file" << endl;
             exit(EXIT_FAILURE);
         }
          
         //cout << "Send data from file:" << buffer << endl;
-        //cout << "Read size: " << file.gcount() << endl;
 	    Socket_send(sockfd, buffer, file.gcount());
 
-        //cout << file.tellg() << endl;
         if (file.eof()){ //stop sending if has reached the end of file
             cout << "file length is: "<< length << endl;
             break;
@@ -171,18 +165,14 @@ int main(int argc, char *argv[])
 }
 
 void Socket_send(int sockfd, char* buffer, int send_size){
-     //if cannot connect to server immediately, set a 10-second timer
       FD_ZERO(&write_fds);            //Zero out the file descriptor set
       FD_SET(sockfd, &write_fds);     //Set the current socket file descriptor into the set
-
-      //We are going to use select to wait for the socket to connect
       tv.tv_sec = 10;                  //The second portion of the struct
       tv.tv_usec = 0;                 //The microsecond portion of the struct
         
       int select_ret = select(sockfd+1, NULL, &write_fds, NULL, &tv);
       if(select_ret == 0)
         {
-            //connection timeout
             close(sockfd);
             cerr<<"ERROR: Attempt to connect to the server timedout!"<<endl;
             exit(EXIT_FAILURE);
@@ -199,9 +189,5 @@ void Socket_send(int sockfd, char* buffer, int send_size){
                 cerr << "ERROR: Error sending data" << endl;
                 exit(EXIT_FAILURE);
             }
-            //check whether msg pass through 
-            //cout << buffer << endl;
-            //cout << "bytes sent: " << byte_s << endl;
-            //cout << "bytes should be sent " << strlen(buffer) << endl;
       }
 }
