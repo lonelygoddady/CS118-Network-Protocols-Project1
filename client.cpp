@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
   sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
   
   // connect to the server
-    int flags = fcntl(sockfd, F_GETFL, 0);
-    fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
+  int flags = fcntl(sockfd, F_GETFL, 0);
+  fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
   
  // if (connect(sockfd, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)   {
   if (connect(sockfd, res->ai_addr, res->ai_addrlen))  { 
@@ -174,7 +174,7 @@ void Socket_send(int sockfd, char* buffer, int send_size){
       if(select_ret == 0)
         {
             close(sockfd);
-            cerr<<"ERROR: Attempt to connect to the server timedout!"<<endl;
+            cerr<<"ERROR: Attempt to send data to the server timedout!"<<endl;
             exit(EXIT_FAILURE);
         }
       else if (select_ret == -1)
